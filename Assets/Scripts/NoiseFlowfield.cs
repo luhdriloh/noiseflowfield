@@ -5,17 +5,49 @@ using UnityEngine;
 public class NoiseFlowfield : MonoBehaviour
 {
     private FastNoise _fastnoise;
+
     public Vector3Int _gridsize;
+    public float _cellSize;
     public float _increment;
-    public Vector3 _offset, _offsetSpeed;
+    public Vector3 _offset, _offsetSpeed; 
+    public Vector3[,,] _flowfieldDirection;
 
-    // gridsize simply tells the size of our grid
+    // gridsize tells the size of our grid
 
+    // particles
+    public GameObject _particleProtoType;
+    public int _numberOfParticles;
+    public float _particleScale;
+    public float _spawnRadius;
 
-	// Use this for initialization
-	private void Start ()
+    [HideInInspector]
+    public List<FlowfieldParticle> _particles;
+
+    // Use this for initialization
+    private void Start ()
     {
-		
+        _flowfieldDirection = new Vector3[_gridsize.x, _gridsize.y, _gridsize.z];
+        _fastnoise = new FastNoise();
+        _particles = new List<FlowfieldParticle>();
+
+        for (int i = 0; i < _numberOfParticles; i++)
+        {
+            Vector3 randomPosition = new Vector3(
+                Random.Range(transform.position.x, transform.position.x + _gridsize.x * _cellSize),
+                Random.Range(transform.position.y, transform.position.y + _gridsize.y * _cellSize),
+                Random.Range(transform.position.z, transform.position.z + _gridsize.z * _cellSize));
+
+            if (ParticleSpawnValidation(randomPosition))
+            {
+                GameObject particleInstance = Instantiate(_particleProtoType);
+                particleInstance.transform.position = randomPosition;
+                particleInstance.transform.parent = transform;
+                particleInstance.transform.localScale = new Vector3(_particleScale, _particleScale, _particleScale);
+                _particles.Add(particleInstance.GetComponent<FlowfieldParticle>());
+            }
+        }
+
+        Debug.Log("Created " + _particles.Count + " particles.");
 	}
 	
 	// Update is called once per frame
@@ -24,10 +56,21 @@ public class NoiseFlowfield : MonoBehaviour
 		
 	}
 
-    private void OnDrawGizmos()
+    private bool ParticleSpawnValidation(Vector3 position)
     {
-        _fastnoise = new FastNoise();
+        foreach (FlowfieldParticle particle in _particles)
+        {
+            if (Vector3.Distance(position, particle.transform.position) <= _spawnRadius)
+            {
+                return false;
+            }
+        }
 
+        return true;
+    }
+
+    private void CalculateFlowfieldDirections()
+    {
         float xOff = 0f;
         for (int x = 0; x < _gridsize.x; x++)
         {
@@ -39,14 +82,9 @@ public class NoiseFlowfield : MonoBehaviour
                 {
                     float noise = _fastnoise.GetSimplex(xOff + _offset.x, yOff + _offset.y, zOff + _offset.z) + 1;
                     Vector3 noiseDirection = new Vector3(Mathf.Cos(noise * Mathf.PI), Mathf.Sin(noise * Mathf.PI), Mathf.Cos(noise * Mathf.PI));
+                    _flowfieldDirection[x, y, z] = Vector3.Normalize(noiseDirection);
 
-                    Gizmos.color = new Color(noiseDirection.normalized.x, noiseDirection.normalized.y, noiseDirection.normalized.z, 1f);
-                    Vector3 pos = new Vector3(x, y, z) + transform.position;
-                    Vector3 endPosition = pos + Vector3.Normalize(noiseDirection);
 
-                    Gizmos.DrawLine(pos, endPosition);
-                    // Gizmos.DrawSphere(pos, .05f);
-                    // Gizmos.DrawSphere(endPosition, .05f);
                     zOff += _increment;
                 }
 
@@ -55,5 +93,12 @@ public class NoiseFlowfield : MonoBehaviour
 
             xOff += _increment;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.gray;
+        Gizmos.DrawWireCube(transform.position + new Vector3((_gridsize.x * _cellSize) * .5f, (_gridsize.y * _cellSize) * .5f, (_gridsize.z * _cellSize) * .5f),
+                            new Vector3(_gridsize.x * _cellSize, _gridsize.y * _cellSize, _gridsize.z * _cellSize));
     }
 }
