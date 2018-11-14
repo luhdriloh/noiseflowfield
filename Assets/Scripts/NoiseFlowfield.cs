@@ -17,8 +17,8 @@ public class NoiseFlowfield : MonoBehaviour
     // particles
     public GameObject _particleProtoType;
     public int _numberOfParticles;
-    public float _particleScale;
     public float _spawnRadius;
+    public float _particleScale, _particleMovespeed, _particleRotation;
 
     [HideInInspector]
     public List<FlowfieldParticle> _particles;
@@ -53,21 +53,9 @@ public class NoiseFlowfield : MonoBehaviour
 	// Update is called once per frame
 	private void Update ()
     {
-		
+        CalculateFlowfieldDirections();
+        ParticleBehavior();
 	}
-
-    private bool ParticleSpawnValidation(Vector3 position)
-    {
-        foreach (FlowfieldParticle particle in _particles)
-        {
-            if (Vector3.Distance(position, particle.transform.position) <= _spawnRadius)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     private void CalculateFlowfieldDirections()
     {
@@ -93,6 +81,69 @@ public class NoiseFlowfield : MonoBehaviour
 
             xOff += _increment;
         }
+    }
+
+    private void ParticleBehavior()
+    {
+        foreach (FlowfieldParticle particle in _particles)
+        {
+            // X component out of bounds
+            if (particle.transform.position.x >= transform.position.x + (_gridsize.x * _cellSize))
+            {
+                particle.transform.position = new Vector3(transform.position.x, particle.transform.position.y, particle.transform.position.z);
+            }
+
+            if (particle.transform.position.x < transform.position.x)
+            {
+                particle.transform.position = new Vector3(transform.position.x + (_gridsize.x * _cellSize), particle.transform.position.y, particle.transform.position.z);
+            }
+
+            // Y component out of bounds
+            if (particle.transform.position.y >= transform.position.y + (_gridsize.y * _cellSize))
+            {
+                particle.transform.position = new Vector3(particle.transform.position.x, transform.position.y, particle.transform.position.z);
+            }
+
+            if (particle.transform.position.y < transform.position.y)
+            {
+                particle.transform.position = new Vector3(particle.transform.position.x, transform.position.y + (_gridsize.y * _cellSize), particle.transform.position.z);
+            }
+
+            // Z component out of bounds
+            if (particle.transform.position.z >= transform.position.z + (_gridsize.z * _cellSize))
+            {
+                particle.transform.position = new Vector3(particle.transform.position.x, particle.transform.position.y, transform.position.z);
+            }
+
+            if (particle.transform.position.z < transform.position.z)
+            {
+                particle.transform.position = new Vector3(particle.transform.position.x, particle.transform.position.y, transform.position.z + (_gridsize.z * _cellSize));
+            }
+
+            // get the area that the particle occupies within the flowfield
+            Vector3Int particlePosition = new Vector3Int(
+                Mathf.FloorToInt(Mathf.Clamp((particle.transform.position.x - transform.position.x) / _cellSize, 0, _gridsize.x - 1)),
+                Mathf.FloorToInt(Mathf.Clamp((particle.transform.position.y - transform.position.y) / _cellSize, 0, _gridsize.y - 1)),
+                Mathf.FloorToInt(Mathf.Clamp((particle.transform.position.z - transform.position.z) / _cellSize, 0, _gridsize.z - 1))
+            );
+
+            particle.ApplyRotation(_flowfieldDirection[particlePosition.x, particlePosition.y, particlePosition.z], _particleRotation);
+            particle._movespeed = _particleMovespeed;
+            particle.transform.localScale = new Vector3(_particleScale, _particleScale, _particleScale);
+        }
+    }
+
+    private bool ParticleSpawnValidation(Vector3 position)
+    {
+        foreach (FlowfieldParticle particle in _particles)
+        {
+            if (Vector3.Distance(position, particle.transform.position) <= _spawnRadius)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void OnDrawGizmos()

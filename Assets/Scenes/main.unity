@@ -283,11 +283,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54dd38573112c46bfa43cdb7398f7b01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gridsize: {x: 10, y: 10, z: 10}
+  _gridsize: {x: 30, y: 10, z: 15}
   _cellSize: 1
-  _increment: 3.47
+  _increment: 3.02
   _offset: {x: 0, y: 0, z: 0}
   _offsetSpeed: {x: 0, y: 0, z: 0}
+  _particleProtoType: {fileID: 1945202656593318, guid: 71339d21a31724a548fda640e2f7daa6,
+    type: 2}
+  _numberOfParticles: 500
+  _spawnRadius: 2
+  _particleScale: 0.49
+  _particleMovespeed: 13.68
+  _particleRotation: 19.93
+  _particles: []
 --- !u!4 &598978834
 Transform:
   m_ObjectHideFlags: 0
@@ -301,45 +309,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1776372780
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4052308112960666, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4052308112960666, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4052308112960666, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4052308112960666, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4052308112960666, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4052308112960666, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4052308112960666, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4052308112960666, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-      propertyPath: m_RootOrder
-      value: 3
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 71339d21a31724a548fda640e2f7daa6, type: 2}
-  m_IsPrefabAsset: 0
